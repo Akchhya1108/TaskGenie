@@ -19,4 +19,4 @@ Coming soon...
 - Real-time updates
 
 ## Author
-Akchhya Singh"# TaskGenie" 
+Akchhya Singh
