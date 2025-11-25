@@ -63,9 +63,8 @@ const taskSchema = new mongoose.Schema({
 });
 
 // Update timestamp on save
-taskSchema.pre('save', function(next) {
+taskSchema.pre('save', function() {
   this.updatedAt = Date.now();
-  next();
 });
 
 // Mark as completed
