@@ -80,16 +80,33 @@ exports.createTask = async (req, res) => {
     let taskData = {
       user: req.user.id,
       title,
-      description,
-      dueDate
+      description
     };
     
-    // Use NLP service for classification if requested
+    // Use NLP service for enhanced classification
     if (useAI !== false) {
       const nlpResult = await classifyTask(`${title} ${description || ''}`);
+      
       taskData.category = nlpResult.category || 'other';
       taskData.priority = nlpResult.priority || 'medium';
       taskData.aiSuggestions = nlpResult.suggestions || [];
+      
+      // Use AI-detected due date if not manually provided
+      if (!dueDate && nlpResult.dueDate) {
+        taskData.dueDate = nlpResult.dueDate;
+      } else if (dueDate) {
+        taskData.dueDate = dueDate;
+      }
+      
+      // Add keywords as tags
+      if (nlpResult.keywords && nlpResult.keywords.length > 0) {
+        taskData.tags = nlpResult.keywords;
+      }
+    } else {
+      // Manual due date if AI is disabled
+      if (dueDate) {
+        taskData.dueDate = dueDate;
+      }
     }
     
     const task = await Task.create(taskData);
@@ -105,7 +122,6 @@ exports.createTask = async (req, res) => {
     });
   }
 };
-
 // @desc    Update task
 // @route   PUT /api/tasks/:id
 // @access  Private
